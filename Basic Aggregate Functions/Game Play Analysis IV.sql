@@ -1,16 +1,5 @@
-WITH first_login AS (
-    -- Find the first login date for each player
-    SELECT player_id, MIN(event_date) AS first_login_date
-    FROM activity
-    GROUP BY player_id
-)
-SELECT 
-    ROUND(
-        COUNT(A1.player_id) 
-        / (SELECT COUNT(DISTINCT A3.player_id) FROM activity A3),
-        2
-    ) AS fraction
-FROM activity A1
-JOIN first_login A2
-ON A1.player_id = A2.player_id 
-AND A1.event_date = A2.first_login_date + INTERVAL '1' DAY;
+SELECT ROUND(COUNT (b.player_id)/COUNT(a.player_id),2) AS fraction
+FROM (SELECT player_id, MIN(event_date) AS event_date FROM Activity
+GROUP BY player_id) a
+LEFT JOIN Activity b
+ON a.player_id = b.player_id AND a.event_date+1 = b.event_date;
